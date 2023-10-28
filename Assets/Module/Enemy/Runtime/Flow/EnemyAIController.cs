@@ -3,32 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using UniRx;
+using Unity.VisualScripting;
+using Cysharp.Threading.Tasks;
 
 public class EnemyAIController
 {
     [Inject]
     private EnemyPatrolState enemyPatrolState;
     [Inject]
+    private EnemyFightState enemyFightState;
+
+    [Inject]
     private EnemyMovePresenter movePresenter;
 
     public EnemyAIController()
     {
-        enemyPatrolState.SwitchChaseStateEvent.Subscribe(_ => { ChaseFlow();});
+        
     }
 
     public void Initialize()
     {
-        PatrolFlow();
+        enemyPatrolState.SwitchFightStateEvent.Subscribe(_ => { enemyPatrolState.StopState(); FightFlow(); });
+        enemyFightState.SwitchPatrolStateEvent.Subscribe(_ => { enemyFightState.StopState(); PatrolFlow().Forget(); });
+        PatrolFlow().Forget();
     }
 
-    public void PatrolFlow()
+    public async UniTask PatrolFlow()
     {
-        enemyPatrolState.StartState();
+        await enemyPatrolState.StartState();
     }
 
-    public void ChaseFlow()
+    public void FightFlow()
     {
-        enemyPatrolState.StartState();
+        enemyFightState.StartState();
     }
 
 }

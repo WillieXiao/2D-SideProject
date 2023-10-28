@@ -6,8 +6,8 @@ using static UnityEngine.GraphicsBuffer;
 
 public class EnemyDetect : MonoBehaviour
 {
-
-    public float bodyRaycastDistance = 1.0f;
+    public bool isPause = false;
+    public float bodyRaycastDistance = 5f;
     public LayerMask layerMask;
     private Collider2D collider2D;
 
@@ -15,7 +15,9 @@ public class EnemyDetect : MonoBehaviour
     public GameObject Target => target;
 
     public Subject<Unit> FindTarget = new Subject<Unit>();
+    public Subject<Unit> CloseToTarget = new Subject<Unit>();
     public Subject<Unit> LostTarget = new Subject<Unit>();
+    public Subject<Unit> ReachTarget = new Subject<Unit>();
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +29,8 @@ public class EnemyDetect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isPause == true)
+            return;
         BodyDetectionRay();
         TrackTarget();
     }
@@ -77,5 +81,27 @@ public class EnemyDetect : MonoBehaviour
             target = null;
             LostTarget.OnNext(Unit.Default);
         }
+        else if (Vector2.Distance(target.transform.position, transform.position) > 0.6f &&
+            Vector2.Distance(target.transform.position, transform.position)<=5f)
+        {
+            CloseToTarget.OnNext(Unit.Default);
+        }
+        else if(Vector2.Distance(target.transform.position, transform.position) <= 0.6f)
+        {
+            ReachTarget.OnNext(Unit.Default);
+        }
+
+    }
+
+    public void OnStopDetect()
+    {
+        isPause = true;
+
+    }
+
+    public void OnStartDetect()
+    {
+        isPause = false;
+
     }
 }

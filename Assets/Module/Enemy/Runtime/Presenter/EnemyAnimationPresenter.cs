@@ -20,4 +20,11 @@ public class EnemyAnimationPresenter
     {
         enemyAnimation.OnMove(value);
     }
+
+    public void EnemyAttack()
+    {
+        enemyAnimation.OnAttack();
+    }
+
 }
+

@@ -26,4 +26,10 @@ public class EnemyAnimation : MonoBehaviour
     {
         animator.SetFloat("Speed", value);
     }
+
+    public void OnAttack()
+    {
+        animator.SetTrigger("Attack");
+    }
+
 }

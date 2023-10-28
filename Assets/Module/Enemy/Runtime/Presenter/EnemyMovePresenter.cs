@@ -9,7 +9,6 @@ public class EnemyMovePresenter
 
     public Subject<Unit> EnemyIdleEvent = new Subject<Unit>();
     public Subject<Unit> EnemyMovingEvent = new Subject<Unit>();
-    public Subject<Unit> EnemyArrivalEvent = new Subject<Unit>();
 
     public EnemyMovePresenter(EnemyMove enemyMove)
     {
@@ -17,14 +16,23 @@ public class EnemyMovePresenter
 
         enemyMove.IdleEvent.Subscribe(_ => { EnemyIdleEvent.OnNext(Unit.Default); });
         enemyMove.MovingEvent.Subscribe(_ => { EnemyMovingEvent.OnNext(Unit.Default); });
-        enemyMove.ArrivalEvent.Subscribe(_ => { EnemyArrivalEvent.OnNext(Unit.Default); });
     }
 
-    public void StartMoveAction(int direction,float durationTime)
+    public void StartMoveAction(Vector2 destination)
     {
-        enemyMove.SetDirection(direction);
-        enemyMove.SetMoveDurationTime(durationTime);
+        enemyMove.SetDirection(destination);
+        enemyMove.SetResting(false);
     }
 
+    public void StartRandomMoveAction()
+    {
+        enemyMove.SetDirection(enemyMove.SetRandomDirection());
+        enemyMove.SetResting(false);
+    }
+
+    public void StartStopAction()
+    {
+        enemyMove.SetResting(true);
+    }
 
 }

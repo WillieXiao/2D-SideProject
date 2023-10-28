@@ -18,12 +18,21 @@ public class EnemyLifetimeScope : LifetimeScope
 
         builder.RegisterComponent<EnemyMove>(enemyGameObject.GetComponent<EnemyMove>());
         builder.RegisterComponent<EnemyAnimation>(enemyGameObject.GetComponent<EnemyAnimation>());
+        builder.RegisterComponent<EnemyDetect>(enemyGameObject.GetComponent<EnemyDetect>());
+        builder.RegisterComponent<EnemyFight>(enemyGameObject.GetComponent<EnemyFight>());
+
 
         builder.Register<EnemyAIController>(Lifetime.Singleton);
         builder.Register<EnemyPatrolState>(Lifetime.Singleton);
+        builder.Register<EnemyChaseState>(Lifetime.Singleton);
+        builder.Register<EnemyAttackState>(Lifetime.Singleton);
+        builder.Register<EnemyFightState>(Lifetime.Singleton);
+
+
         builder.Register<EnemyMovePresenter>(Lifetime.Singleton);
         builder.Register<EnemyAnimationPresenter>(Lifetime.Singleton);
-
+        builder.Register<EnemyDetectPresenter>(Lifetime.Singleton);
+        builder.Register<EnemyFightPresenter>(Lifetime.Singleton);
 
     }
 }

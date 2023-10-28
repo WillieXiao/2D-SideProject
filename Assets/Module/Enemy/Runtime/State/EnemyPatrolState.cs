@@ -5,6 +5,8 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using UnityEngine.PlayerLoop;
+using System;
+using Unity.VisualScripting.Antlr3.Runtime;
 
 public class EnemyPatrolState
 {
@@ -19,8 +21,8 @@ public class EnemyPatrolState
     private int currentPatrolDirection = 1;
     private int patrolRange;
 
-
-    public Subject<Unit> SwitchChaseStateEvent = new Subject<Unit>();
+    private bool statusIsActive = false;
+    public Subject<Unit> SwitchFightStateEvent = new Subject<Unit>();
 
     public EnemyPatrolState(EnemyMovePresenter movePresenter,EnemyAnimationPresenter animationPresenter,EnemyDetectPresenter detectPresenter)
     {
@@ -28,39 +30,59 @@ public class EnemyPatrolState
         this.animationPresenter = animationPresenter;
         this.detectPresenter = detectPresenter;
 
-        cancellationTokenSource = new CancellationTokenSource();
-
         movePresenter.EnemyMovingEvent.Subscribe(_ => { animationPresenter.EnemyMove(1f); });
         movePresenter.EnemyIdleEvent.Subscribe(_ => { animationPresenter.EnemyIdle(); });
-        movePresenter.EnemyArrivalEvent.Subscribe(async _ => { await StopPatrolMove(cancellationTokenSource.Token); });
+        detectPresenter.EnemyFindTargetEvent.Subscribe(_ => 
+        { 
+            if(statusIsActive == true)
+                SwitchFightStateEvent.OnNext(Unit.Default);
+        });
 
-        detectPresenter.EnemyFindTargetEvent.Subscribe(_ => { StopState(); SwitchChaseStateEvent.OnNext(Unit.Default); });
     }
 
-    public void StartState()
+    public async UniTask StartState()
     {
-        StartPatrolMove();
+        statusIsActive = true;
+        cancellationTokenSource = new CancellationTokenSource();
+        await StartPatrolMove(cancellationTokenSource.Token);
     }
 
     public void StopState()
     {
+        statusIsActive = false;
         cancellationTokenSource.Cancel();
+        cancellationTokenSource = null;
     }
 
 
-    public void StartPatrolMove()
+    public async UniTask StartPatrolMove(CancellationToken cancellationToken)
     {
-        var result = Random.Range(0f, 100f);
-        currentPatrolDirection = (result > 50f) ? -1 : 1;
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
 
-        movePresenter.StartMoveAction(currentPatrolDirection, Random.Range(minMoveTime, maxMoveTime));
+        movePresenter.StartRandomMoveAction();
+
+        await UniTask.WaitForSeconds(UnityEngine.Random.Range(minMoveTime, maxMoveTime), cancellationToken: cancellationToken);
+
+        await StopPatrolMove(cancellationToken);
+
+        
     }
 
     public async UniTask StopPatrolMove(CancellationToken cancellationToken)
     {
-        await UniTask.WaitForSeconds
-            (Random.Range(minIdleTime,maxIdleTime),false,PlayerLoopTiming.Update,cancellationToken);
-        StartPatrolMove();
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        movePresenter.StartStopAction();
+
+        await UniTask.WaitForSeconds(UnityEngine.Random.Range(minIdleTime, maxIdleTime), cancellationToken: cancellationToken);
+
+        await StartPatrolMove(cancellationToken);
     }
 
 }

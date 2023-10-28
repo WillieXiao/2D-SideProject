@@ -12,9 +12,10 @@ public class EnemyMove : MonoBehaviour
     private Rigidbody2D rigidbody;
     private CapsuleCollider2D capsuleCollider;
 
+    private Vector2 destination;
     private int direction;
     private float durationTime;
-    private bool isArrival = true;
+    private bool isResting = true;
     private bool facingRight = false;
 
     public Subject<Unit> IdleEvent = new Subject<Unit>();
@@ -32,20 +33,24 @@ public class EnemyMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(isArrival == false)
+        if(isResting == false)
         {
-            if(durationTime <= 0)
-            {
-                isArrival = true;
-                IdleEvent.OnNext(Unit.Default);
-                ArrivalEvent.OnNext(Unit.Default);
-                return;
-            }
-
             rigidbody.velocity = new Vector2 (direction * moveSpeed, rigidbody.velocity.y);
             MovingEvent.OnNext(Unit.Default);
-            durationTime -= Time.deltaTime;
         }
+        else
+        {
+            IdleEvent.OnNext(Unit.Default);
+        }
+    }
+
+    public void CheckFlip()
+    {
+        if (direction > 0 && !facingRight)
+            Flip();
+        else if (direction < 0 && facingRight)
+            Flip();
+
     }
 
     public void Flip()
@@ -57,19 +62,25 @@ public class EnemyMove : MonoBehaviour
     }
 
 
-    public void SetDirection(int dir)
+    public void SetDirection(Vector2 destination)
     {
-        direction = dir;
-        isArrival = false;
+        this.destination = destination;
+        direction = (destination.x > transform.position.x) ? 1 : -1;
 
-        if (direction > 0 && !facingRight)
-            Flip();
-        else if (direction < 0 && facingRight)
-            Flip();
+        CheckFlip();
     }
 
-    public void SetMoveDurationTime(float time)
+    public Vector2 SetRandomDirection()
     {
-        durationTime = time;
+        int randomSide = UnityEngine.Random.Range(0, 100);
+        int randomDistance = UnityEngine.Random.Range(3, 9);
+        Vector2 newDestination = 
+            new Vector2((randomSide>50)?transform.position.x + randomDistance:transform.position.x - randomDistance, randomDistance);
+        return newDestination;
+    }
+
+    public void SetResting(bool rest)
+    {
+        isResting = rest;
     }
 }
