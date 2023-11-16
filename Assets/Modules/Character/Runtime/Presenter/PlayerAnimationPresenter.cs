@@ -22,7 +22,12 @@ public class PlayerAnimationPresenter
 
     public void CharacterJump()
     {
-        playerAnimation.OnJump();
+        playerAnimation.OnGeneralJump();
+    }
+
+    public void CharacterAirJump()
+    {
+        playerAnimation.OnAirJump();
     }
 
     public void CharacterLand()

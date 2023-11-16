@@ -28,5 +28,6 @@ public class PlayerFightPresenter
         Debug.Log(playerFight.CurrentAttackCount);
         playerFight.ResetAttackLevelCoolDown();
         playerFight.SetAttackState(true);
+        playerFight.SetWeaponCollierState(true);
     }
 }

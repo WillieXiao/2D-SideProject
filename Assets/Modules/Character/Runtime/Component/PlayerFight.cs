@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerFight : MonoBehaviour
 {
+    [SerializeField]
+    private Collider2D weaponCollider;
+
     private bool attacking;
 
     public bool AttackState => attacking;
@@ -15,9 +18,16 @@ public class PlayerFight : MonoBehaviour
 
     private float attackLevelCoolDownTimer = 1f;
 
+   
+
     public void SetAttackState(bool isAttacking)
     {
         attacking = isAttacking;
+    }
+
+    public void SetWeaponCollierState(bool state)
+    {
+        weaponCollider.enabled = state;
     }
 
     public void AddAttackCount()

@@ -25,6 +25,7 @@ public class EnemyFightPresenter
 
         EnemyNeedAttackEvent.OnNext(Unit.Default);
         enemyFight.SetAttackState(true);
+        enemyFight.SetWeaponCollierState(true);
         //EnemyNeedAttackEvent.OnNext(playerFight.CurrentAttackCount);
         //Debug.Log(playerFight.CurrentAttackCount);
         //playerFight.ResetAttackLevelCoolDown();

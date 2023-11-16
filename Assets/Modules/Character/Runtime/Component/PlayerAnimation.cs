@@ -30,13 +30,22 @@ public class PlayerAnimation : MonoBehaviour
         animator.SetFloat("Speed", value);
     }
 
-    public void OnJump()
+    public void OnGeneralJump()
     {
         if (animator.GetBool("Landing") == false)
             return;
         animator.SetTrigger("Jump");
         animator.SetBool("Jumping",true);
         animator.SetBool("Landing", false);
+        animator.SetBool("Fall", false);
+    }
+
+    public void OnAirJump()
+    {
+        animator.SetTrigger("AirJump");
+        animator.SetBool("Jumping", true);
+        animator.SetBool("Landing", false);
+        animator.SetBool("Fall", false);
     }
 
     public void OnLand()

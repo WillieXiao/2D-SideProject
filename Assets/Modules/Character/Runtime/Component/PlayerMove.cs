@@ -22,10 +22,14 @@ public class PlayerMove : MonoBehaviour
     private bool facingRight = true;
     private bool isGrounded;
     private bool isLockMove;
+    private int airJumpCount = 1;
     private Vector2 m_Velocity = Vector2.zero;
 
     public Subject<bool> LandingEvent = new Subject<bool>();
     public Subject<Unit> FallingEvent = new Subject<Unit>();
+
+    public Subject<Unit> PlayAirJumpAnimationEvent = new Subject<Unit>();
+    public Subject<Unit> PlayGeneralJumpAnimationEvent = new Subject<Unit>();
 
     // Start is called before the first frame update
     void Start()
@@ -66,8 +70,18 @@ public class PlayerMove : MonoBehaviour
 
     public void OnJump()
     {
-        if (isGrounded == false)
+        if (isGrounded == false && airJumpCount<=0)
             return;
+        if(isGrounded == false && airJumpCount > 0)
+        {
+            rigidbody.velocity = Vector2.zero;
+            PlayAirJumpAnimationEvent.OnNext(Unit.Default);
+            airJumpCount--;
+        }
+        else if(isGrounded == true)
+        {
+            PlayGeneralJumpAnimationEvent.OnNext(Unit.Default);
+        }
         rigidbody.AddForce(new Vector2(0f,jumpForce));
 
     }
@@ -75,11 +89,7 @@ public class PlayerMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isGrounded == false && rigidbody.velocity.y < 0.5f)
-        {
-            FallingEvent.OnNext(Unit.Default);
-        }
-
+        
     }
 
     private void FixedUpdate()
@@ -96,8 +106,17 @@ public class PlayerMove : MonoBehaviour
             {
                 isGrounded = true;
                 if (!wasGrounded)
+                {
                     LandingEvent.OnNext(true);
+                    airJumpCount = 1;
+                }
+                   
             }
+        }
+
+        if (isGrounded == false && rigidbody.velocity.y < 0f)
+        {
+            FallingEvent.OnNext(Unit.Default);
         }
     }
 }

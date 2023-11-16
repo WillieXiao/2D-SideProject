@@ -10,12 +10,19 @@ public class PlayerMovePresenter
     public Subject<Unit> PlayerNeedLandEvent = new Subject<Unit>();
     public Subject<Unit> PlayerNeedFallEvent = new Subject<Unit>();
 
+    public Subject<Unit> PlayGeneralJumpAnimation = new Subject<Unit>();
+    public Subject<Unit> PlayAirJumpAnimation = new Subject<Unit>();
+
     public PlayerMovePresenter(PlayerMove playerMove)
     {
         this.playerMove = playerMove;
 
         playerMove.LandingEvent.Subscribe(_ => { PlayerNeedLandEvent.OnNext(Unit.Default); });
         playerMove.FallingEvent.Subscribe(_ => { PlayerNeedFallEvent.OnNext(Unit.Default); });
+
+        playerMove.PlayGeneralJumpAnimationEvent.Subscribe(_ => { PlayGeneralJumpAnimation.OnNext(Unit.Default); });
+        playerMove.PlayAirJumpAnimationEvent.Subscribe(_ => { PlayAirJumpAnimation.OnNext(Unit.Default); });
+
     }
 
     public void CharacterJump()

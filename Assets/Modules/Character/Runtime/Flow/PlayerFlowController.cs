@@ -41,8 +41,6 @@ public class PlayerFlowController
         playerInputPresenter.PlayerJumpInputEvent.Subscribe(_ => 
         { 
             playerMovePresenter.CharacterJump();
-            playerAnimationPresenter.CharacterJump();
-
         });
 
         playerInputPresenter.PlayerAttackInputEvent.Subscribe(_ =>
@@ -50,6 +48,7 @@ public class PlayerFlowController
             playerFightPresenter.CheckCurrentAttackState();
 
         });
+
 
         //Player Move Presenter Event
         playerMovePresenter.PlayerNeedLandEvent.Subscribe(_ => 
@@ -60,6 +59,16 @@ public class PlayerFlowController
         playerMovePresenter.PlayerNeedFallEvent.Subscribe(_ =>
         {
             playerAnimationPresenter.CharacterFall();
+        });
+
+        playerMovePresenter.PlayGeneralJumpAnimation.Subscribe(_ =>
+        {
+            playerAnimationPresenter.CharacterJump();
+        });
+
+        playerMovePresenter.PlayAirJumpAnimation.Subscribe(_ =>
+        {
+            playerAnimationPresenter.CharacterAirJump();
         });
 
         //Player Fight Presenter Event

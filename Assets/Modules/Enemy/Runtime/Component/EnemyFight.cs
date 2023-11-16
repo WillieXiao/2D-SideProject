@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class EnemyFight : MonoBehaviour
 {
+    [SerializeField]
+    private Collider2D weaponCollider;
+
     private bool isAttacking = false;
     public bool IsAttacking => isAttacking;
 
@@ -48,5 +51,10 @@ public class EnemyFight : MonoBehaviour
                 currentAttackCount = 0;
             }
         }
+    }
+
+    public void SetWeaponCollierState(bool state)
+    {
+        weaponCollider.enabled = state;
     }
 }
